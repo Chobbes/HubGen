@@ -23,8 +23,17 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <mux_pipe.h>
 #include <muxparse.h>
+
+
+/*
+  Size of the pipes array, and the amount that we will increase the
+  pipe array size by if there are too many pipes to fit in the
+  array. This number is for the number of pipes in the array.
+*/
+const int PIPE_CHUNK_SIZE = 256;
 
 
 void usage(char *program_name)
@@ -50,6 +59,41 @@ int main(int argc, char *argv[])
 
 	return 1;
     }
+
+    int pipe_count = 0;  /* Number of pipes in the file */
+    int chunk_count = 1; /* We start with one pipe chunk sized array */
+    MuxPipe *pipes = malloc(PIPE_CHUNK_SIZE * sizeof(MuxPipe));
+
+    MuxPipe parsed_pipe;
+    int parse_result = mux_parse_pipe(input_file, &parsed_pipe);
+
+    while (0 == parse_result) {
+	if (pipe_count + 1 > chunk_count * PIPE_CHUNK_SIZE) {
+	    /* We are on the edge of a pipe chunk - need more pipes" */
+	    ++chunk_count;
+	    pipes = realloc(pipes, chunk_count * PIPE_CHUNK_SIZE);
+
+	    if (NULL == pipes) {
+		fprintf(stderr, "Memory allocation failure: ");
+		fprintf(stderr, "Could not grow pipes array!\n");
+
+		return 1;
+	    }
+	}
+
+	/* Add pipe to pipes array */
+	pipes[pipe_count] = parsed_pipe;
+	++pipe_count;
+
+	/* Fetch the next pipe */
+	parse_result = mux_parse_pipe(input_file, &parsed_pipe);
+    }
+
+    if (2 == parse_result) {
+	fprintf(stderr, "Error parsing file!\n");
+    }
+
+    printf("Loaded %d pipes...\n", pipe_count);
 
     return 0;
 }
