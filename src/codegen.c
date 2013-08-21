@@ -68,8 +68,7 @@ static void write_setup(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
 /* Function to write a loop function to the output file */
 static void write_loop(FILE *output_file)
 {
-    char *loop = "void loop()\n{\n    mux_update;\n}\n";
-    fprintf(output_file, loop);
+    fprintf(output_file, "void loop()\n{\n    mux_update;\n}\n");
 }
 
 
