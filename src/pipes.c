@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mux_pipe.h>
+#include <muxparse.h>
 
 
 /*
@@ -69,7 +70,6 @@ MuxPipe * load_pipes(FILE *input_file, size_t *total_pipes)
     }
 
     if (2 == parse_result) {
-	fprintf(stderr, "Error parsing file!\n");
 	return NULL;
     }
 
