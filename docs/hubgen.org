@@ -1,0 +1,56 @@
+#+TITLE: HubGen Notes
+#+AUTHOR: Calvin Beck
+#+OPTIONS: ^:{}
+
+* Introduction
+  HubGen is a C program designed to generate Arduino programs for
+  ".mux" (see the MuxParse library) networks. The basic idea is that
+  the ".mux" file describes the network - how you want to map inputs
+  and outputs on an Arduino, we take this information, and generate an
+  Arduino program which maps those inputs to outputs. Each input is
+  read, and that value contributes to the output as described in the
+  MuxDuino library.
+
+* Usage
+  In order to use HubGen after it has been installed the only thing
+  you need to know is:
+
+  #+BEGIN_EXAMPLE
+    $ hubgen <input filename> <output filename>
+  #+END_EXAMPLE
+
+  Where *<input filename>* and *<output filename>* are replaced by the
+  path to your input ".mux" file, and the path to the Arduino C++ file
+  that you want to output respectively. This C++ file relies upon the
+  MuxDuino library, but otherwise it should just compile and be
+  completely ready for use on an Arduino. You may want to modify this
+  file some if you want to do anything special - like perhaps flip the
+  channel of an output depending on a pin value.
+
+* Current Limitations
+  HubGen is currently not able to do some of the following things,
+  which might be useful in the future:
+
+  - Utilize channels in a reasonable manner. The first channel
+    assigned to an output in the file is the only channel the output
+    will use in the Arduino program.
+  - No error checking is done on the pipes in the ".mux" file. If the
+    file parses fine, but you have a pin assigned to both an input and
+    an output (which is illegal in MuxDuino) no warnings or error
+    messages are generated. This may be difficult to debug. We should
+    at least check for this kind of thing. We can't check for pin
+    numbers being out of range unfortunately because different
+    Arduinos have different pins.
+  - There should probably be an option to use the Serial port to send
+    messages for errors and whatnot from MuxDuino in the generated
+    Arduino program. Note that this may not always be desired because
+    we may want to use pins 0 and 1!
+  - There is currently no way to use custom loop() functions for the
+    generated Arduino code. This might be useful again for things like
+    switching output channels, printing debug information. It may be
+    best to just edit these after the fact in the long run anyway.
+
+* Other Possible Features
+  - ".dot" file generation for the networks might actually be useful
+    for debugging networks. It may provide a useful visualization.
+
