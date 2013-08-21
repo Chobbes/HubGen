@@ -1,0 +1,13 @@
+# Network files to set up communicators - a bidirectional bit
+# transmission protocol thing.
+
+# Communicator 1 pipes.
+2 11 0;  # Bit
+3 12 0;  # Lock
+13 4 0;  # Ack
+
+
+# Communicator 2 pipes.
+8 5 0;   # Bit
+9 6 0;   # Lock
+7 10 0;  # Ack
