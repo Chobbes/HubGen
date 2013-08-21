@@ -35,7 +35,7 @@
   pipe array size by if there are too many pipes to fit in the
   array. This number is for the number of pipes in the array.
 */
-const int PIPE_CHUNK_SIZE = 256;
+static const int PIPE_CHUNK_SIZE = 256;
 
 
 MuxPipe * load_pipes(FILE *input_file, size_t *total_pipes)
