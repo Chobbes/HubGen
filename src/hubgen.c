@@ -27,6 +27,7 @@
 #include <mux_pipe.h>
 
 #include "pipes.h"
+#include "codegen.h"
 
 
 void usage(char *program_name)
@@ -45,9 +46,17 @@ int main(int argc, char *argv[])
     }
 
     FILE *input_file = fopen(argv[1], "r");
+    FILE *output_file = fopen(argv[2], "w");
 
     if (NULL == input_file) {
 	fprintf(stderr, "No such file: \"%s\"\n", argv[1]);
+	usage(argv[0]);
+
+	return 1;
+    }
+
+    if (NULL == output_file) {
+	fprintf(stderr, "Problem with output file: \"%s\"\n", argv[2]);
 	usage(argv[0]);
 
 	return 1;
@@ -63,7 +72,13 @@ int main(int argc, char *argv[])
 	return 1;
     }
 
+    fclose(input_file);
     printf("Loaded %zd pipes...\n", total_pipes);
 
+    write_arduino_code(output_file, pipes, total_pipes);
+    printf("Done. Wrote to \"%s\"\n", argv[2]);
+
+    fclose(output_file);
+    free(pipes);
     return 0;
 }
