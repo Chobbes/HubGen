@@ -48,8 +48,9 @@ static void write_header(FILE *output_file)
 /* Function to write a setup function to the output file */
 static void write_setup(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
 {
-    char *setup = "void setup()\n{\n    MuxPipe pipe;\n";
     char *indent = "    ";  /* This is a bit silly... */
+
+    fprintf(output_file, "void setup()\n{\n    MuxPipe pipe;\n");
 
     for (int index = 0; index < total_pipes; ++index) {
 	/* Make all of the pipe registrations we need! */
@@ -68,7 +69,7 @@ static void write_setup(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
 /* Function to write a loop function to the output file */
 static void write_loop(FILE *output_file)
 {
-    fprintf(output_file, "void loop()\n{\n    mux_update;\n}\n");
+    fprintf(output_file, "void loop()\n{\n    mux_update();\n}\n");
 }
 
 
