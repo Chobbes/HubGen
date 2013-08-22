@@ -38,6 +38,46 @@
 static const int PIPE_CHUNK_SIZE = 256;
 
 
+/*
+  Arguments:
+      pipe: The pipe we want to check.
+
+      pipes: All of the previously parsed pipes.
+
+      total_pipes: Number of pipes in the pipes array.
+
+  Check if the pipe is valid - basically just checks for inputs being
+  declared as outputs or vice versa. Prints warnings to stderr if
+  there are problems with the pipe.
+*/
+static void pipe_warnings(MuxPipe pipe, MuxPipe *pipes, size_t total_pipes)
+{
+    if (pipe.out_pin == pipe.in_pin) {
+	fprintf(stderr, "Can't have a pipe with the same input and output:");
+	fprintf(stderr, " %d\n", pipe.out_pin);
+
+	return;
+    }
+
+    for (int index = 0; index < total_pipes; ++index) {
+	MuxPipe array_pipe = pipes[index];
+
+	if (pipe.out_pin == array_pipe.in_pin) {
+	    fprintf(stderr, "Output %d ", pipe.out_pin);
+	    fprintf(stderr, "is an input for %d!\n", array_pipe.out_pin);
+
+	    return;
+	}
+	else if (pipe.in_pin == array_pipe.out_pin) {
+	    fprintf(stderr, "Input %d ", pipe.in_pin);
+	    fprintf(stderr, "is an output for %d!\n", array_pipe.in_pin);
+
+	    return;
+	}
+    }
+}
+
+
 MuxPipe * load_pipes(FILE *input_file, size_t *total_pipes)
 {
     size_t pipe_count = 0;  /* Number of pipes in the file */
@@ -60,6 +100,9 @@ MuxPipe * load_pipes(FILE *input_file, size_t *total_pipes)
 		return NULL;
 	    }
 	}
+
+	/* Print any necessary warnings */
+	pipe_warnings(parsed_pipe, pipes, pipe_count);
 
 	/* Add pipe to pipes array */
 	pipes[pipe_count] = parsed_pipe;
