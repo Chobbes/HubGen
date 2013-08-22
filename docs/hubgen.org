@@ -16,7 +16,7 @@
   you need to know is:
 
   #+BEGIN_EXAMPLE
-    $ hubgen <input filename> <output filename>
+    $ hubgen <input filename> <output filename> [-v]
   #+END_EXAMPLE
 
   Where *<input filename>* and *<output filename>* are replaced by the
@@ -33,6 +33,13 @@
   an output and vice versa. The file will still be written, but
   MuxDuino will have problems with these pipes.
 
+  If the optional *-v* argument is used then the HubGen program will
+  spit out Arduino C++ code which uses the serial port to print
+  additional information. This will print things like errors that
+  occured when registering MuxDuino pipes, and the values written to
+  ouput pins in the network. Note that if this option is used the
+  serial pins, 0 and 1, must be free and not used in the network!
+
 * Current Limitations
   HubGen is currently not able to do some of the following things,
   which might be useful in the future:
@@ -42,10 +49,6 @@
     will use in the Arduino program.
   - We can't check for pin numbers being out of range unfortunately
     because different Arduinos have different pins.
-  - There should probably be an option to use the Serial port to send
-    messages for errors and whatnot from MuxDuino in the generated
-    Arduino program. Note that this may not always be desired because
-    we may want to use pins 0 and 1!
   - There is currently no way to use custom loop() functions for the
     generated Arduino code. This might be useful again for things like
     switching output channels, printing debug information. It may be
