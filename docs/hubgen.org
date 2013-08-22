@@ -27,6 +27,12 @@
   file some if you want to do anything special - like perhaps flip the
   channel of an output depending on a pin value.
 
+  This program will also print warnings to stderr if the pipes
+  described in the mux file are invalid. Such as if one of them has
+  the same input and output, or if an input was previously declared as
+  an output and vice versa. The file will still be written, but
+  MuxDuino will have problems with these pipes.
+
 * Current Limitations
   HubGen is currently not able to do some of the following things,
   which might be useful in the future:
@@ -34,13 +40,8 @@
   - Utilize channels in a reasonable manner. The first channel
     assigned to an output in the file is the only channel the output
     will use in the Arduino program.
-  - No error checking is done on the pipes in the ".mux" file. If the
-    file parses fine, but you have a pin assigned to both an input and
-    an output (which is illegal in MuxDuino) no warnings or error
-    messages are generated. This may be difficult to debug. We should
-    at least check for this kind of thing. We can't check for pin
-    numbers being out of range unfortunately because different
-    Arduinos have different pins.
+  - We can't check for pin numbers being out of range unfortunately
+    because different Arduinos have different pins.
   - There should probably be an option to use the Serial port to send
     messages for errors and whatnot from MuxDuino in the generated
     Arduino program. Note that this may not always be desired because
