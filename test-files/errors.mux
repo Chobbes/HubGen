@@ -1,0 +1,9 @@
+# Same input and output - bad.
+1 1 0;
+
+# Input previously declared as an output.
+1 2 0;
+
+# Output previously declared as an input.
+3 1 0;
+
