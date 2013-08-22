@@ -45,4 +45,22 @@
 
 void write_arduino_code(FILE *output_file, MuxPipe *pipes, size_t total_pipes);
 
+
+/*
+  Arguments:
+      output_file: The file that we write to.
+
+      pipes: Array of pipe structures to register / whatever.
+
+      total_pipes: The number of pipes in the array.
+
+  Writes an Arduino program to the file which acts as a networking hub
+  using the MuxDuino library. Additionally this generates code which
+  produces debugging information over the serial port. Make sure the
+  serial pins are free and not used in any pipes!
+
+ */
+
+void write_arduino_code_verbose(FILE *output_file, MuxPipe *pipes, size_t total_pipes);
+
 #endif
