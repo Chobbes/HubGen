@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <mux_pipe.h>
 
 #include "pipes.h"
@@ -32,17 +33,32 @@
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "Usage: %s <input file> <output file>\n", program_name);
+    fprintf(stderr, "Usage: %s <input file> <output file> [-v]\n", program_name);
 }
 
 
 int main(int argc, char *argv[])
 {
-    if (3 != argc) {
+    if ((3 != argc) && (4 != argc)) {
 	fprintf(stderr, "Invalid number of arguments!\n");
 	usage(argv[0]);
 
 	return 1;
+    }
+
+    /* Flag for whether or not we want verbose output */
+    int verbose = 0;
+
+    if (4 == argc) {
+	if (strncmp("-v", argv[3], 5)) {
+	    fprintf(stderr, "Invalid optional argument!\n");
+	    usage(argv[0]);
+
+	    return 1;
+	}
+	else {
+	    verbose = 1;
+	}
     }
 
     FILE *input_file = fopen(argv[1], "r");
@@ -75,7 +91,14 @@ int main(int argc, char *argv[])
     fclose(input_file);
     printf("Loaded %zd pipes...\n", total_pipes);
 
-    write_arduino_code(output_file, pipes, total_pipes);
+    if (verbose) {
+	printf("Creating verbose output -- make sure serial pins are free!\n");
+	write_arduino_code_verbose(output_file, pipes, total_pipes);
+    }
+    else {
+	write_arduino_code(output_file, pipes, total_pipes);
+    }
+
     printf("Done. Wrote to \"%s\"\n", argv[2]);
 
     fclose(output_file);
