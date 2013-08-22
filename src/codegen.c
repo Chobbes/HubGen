@@ -66,10 +66,46 @@ static void write_setup(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
 }
 
 
+/* Same as write setup, but opens the serial port and prints debug information. */
+static void write_setup_verbose(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
+{
+    char *indent = "    ";  /* This is a bit silly... */
+
+    fprintf(output_file, "void setup()\n{\n%sSerial.begin(9600);\n\n", indent);
+    fprintf(output_file, "%sMuxPipe pipe;\n", indent);
+
+    for (int index = 0; index < total_pipes; ++index) {
+	/* Make all of the pipe registrations we need! */
+	MuxPipe current = pipes[index];
+
+	fprintf(output_file, "\n%spipe.in_pin = %d;\n", indent, current.in_pin);
+	fprintf(output_file, "%spipe.out_pin = %d;\n", indent, current.out_pin);
+	fprintf(output_file, "%spipe.channel = %d;\n\n", indent, current.channel);
+	fprintf(output_file, "%sif (register_pipe(pipe)) {\n", indent);
+	fprintf(output_file, "%s%sSerial.print(\"Could not register pipe: \");\n", indent, indent);
+	fprintf(output_file, "%s%sSerial.print(pipe.in_pin);\n", indent, indent);
+	fprintf(output_file, "%s%sSerial.print(\" -> \");\n", indent, indent);
+	fprintf(output_file, "%s%sSerial.print(pipe.out_pin);\n", indent, indent);
+	fprintf(output_file, "%s%sSerial.print(\" on channel \");\n", indent, indent);
+	fprintf(output_file, "%s%sSerial.println(pipe.channel);\n", indent, indent);
+	fprintf(output_file, "%s}\n", indent);
+    }
+
+    fprintf(output_file, "}\n\n");
+}
+
+
 /* Function to write a loop function to the output file */
 static void write_loop(FILE *output_file)
 {
     fprintf(output_file, "void loop()\n{\n    mux_update();\n}\n");
+}
+
+
+/* Same as write_loop(), but uses the mux_update_serial_debug() function */
+static void write_loop_verbose(FILE *output_file)
+{
+    fprintf(output_file, "void loop()\n{\n    mux_update_serial_debug();\n}\n");
 }
 
 
@@ -78,4 +114,13 @@ void write_arduino_code(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
     write_header(output_file);
     write_setup(output_file, pipes, total_pipes);
     write_loop(output_file);
+}
+
+
+/* Same as write_arduino_code(), but uses the verbose versions of functions */
+void write_arduino_code_verbose(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
+{
+    write_header(output_file);
+    write_setup_verbose(output_file, pipes, total_pipes);
+    write_loop_verbose(output_file);
 }
