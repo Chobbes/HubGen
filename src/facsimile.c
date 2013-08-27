@@ -24,9 +24,64 @@
 
 #include "facsimile.h"
 #include <stdlib.h>
+#include <mux_pipe.h>
 
 
-void write_facsimile_code(FILE *output_file, MuxPipe *pipes, size_t total_pipes)
+static const char *indent = "    ";
+
+
+static void write_indents(FILE *out_file, int level)
 {
-    
+    for (int amount = 0; amount < level; ++amount) {
+	fprintf(out_file "%s", indent);
+    }
+}
+
+
+static void out_name(FILE *out_file, int out_pin)
+{
+    fprintf(out_file, "out%d", out_pin);
+}
+
+
+static void out_chan(FILE *out_file, int out_pin)
+{
+    fprintf(out_file, "out%d_chan", out_pin);
+}
+
+
+static void in_name(FILE *out_file, int in_pin)
+{
+    fprintf(out_file, "in%d", in_pin);
+}
+
+
+/* Write all of the inputs for a certain channel to a lovely or'd expression */
+static void write_channel_inputs(FILE *out_file,
+				 MuxPipe *pipes,
+				 size_t total_pipes,
+				 int out_pin,
+				 int channel)
+{
+    size_t num_ins = 0; /* Number of inputs that we have written */
+
+    for (size_t index = 0; index < total_pipes; ++index) {
+	MuxPipe current = pipes[index];
+
+	if (out_pin == current.out_pin && channel == current.channel) {
+	    if (0 != num_ins) {
+		/* This is not the first one - we need an or! */
+		fprintf(out_file, " || ");
+	    }
+
+	    in_name(out_file, current.in_pin);
+	}
+    }
+}
+
+
+void write_facsimile_code(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
+{
+    fprintf(out_file, "unit hub {\n");
+    fprintf(out_file, "\n}\n");
 }
