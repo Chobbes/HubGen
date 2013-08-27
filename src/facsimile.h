@@ -25,6 +25,24 @@
 #ifndef FACSIMILE_H
 #define FACSIMILE_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <mux_pipe.h>
 
+
+/*
+  Arguments:
+      output_file: The file that we write to.
+
+      pipes: Array of pipe structures to register / whatever.
+
+      total_pipes: The number of pipes in the array.
+
+  Writes a Facsimile program to the file which acts as a networking
+  hub.
+
+ */
+
+void write_facsimile_code(FILE *out_file, MuxPipe *pipes, size_t total_pipes);
 
 #endif
