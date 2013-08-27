@@ -59,7 +59,17 @@
         process mux_update {
             phase update {
                 // One of these for each output.
-                out# = ((out#_chan == n1) ? (in# || in# || ... || in#) : ((out#_chan == n2) ? (in# || ... || in#) : out#));
+    
+                // We have an elif for each channel.
+                if (out#_chan == n1) {
+                    out# = in# || in# || ... || in#; 
+                }
+                elif (out#_chan == n2) {
+                    out# = in# || ... || in#;
+                }
+    
+                // ...
+    
             }
         }
     }
