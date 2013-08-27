@@ -40,6 +40,36 @@
   ouput pins in the network. Note that if this option is used the
   serial pins, 0 and 1, must be free and not used in the network!
 
+* Facsimile Code Generation
+  We may want to add a Facsimile code generator so that we can check
+  our hub for correctness and include it in our models.
+
+  The implementation of this is actually pretty simple. We will
+  generate a hub unit with the following form:
+
+  #+BEGIN_SRC c
+    unit hub {
+        output out# = false;
+        int out#_chan = n;  // n is the first pipe with this output's channel.
+        // More of these...
+    
+        input in#;
+        // More of these as well...
+    
+        process mux_update {
+            phase update {
+                // One of these for each output.
+                out# = ((out#_chan == n1) ? (in# || in# || ... || in#) : ((out#_chan == n2) ? (in# || ... || in#) : out#));
+            }
+        }
+    }
+  #+END_SRC
+
+  If we can output something of this form it should perform an update
+  on the pipes for each run through update, and if we so desired we
+  could add another phase to *mux_update* in order to alter the output
+  channels.
+
 * Current Limitations
   HubGen is currently not able to do some of the following things,
   which might be useful in the future:
