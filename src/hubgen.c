@@ -24,22 +24,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <mux_pipe.h>
 
 #include "pipes.h"
 #include "codegen.h"
+#include "facsimile.h"
 
 
 void usage(char *program_name)
 {
-    fprintf(stderr, "Usage: %s <input file> <output file> [-v]\n", program_name);
+    fprintf(stderr, "Usage: %s <input file> <output file> [-v] [-f]\n", program_name);
 }
 
 
 int main(int argc, char *argv[])
 {
-    if ((3 != argc) && (4 != argc)) {
+    if (3 > argc) {
 	fprintf(stderr, "Invalid number of arguments!\n");
 	usage(argv[0]);
 
@@ -49,16 +51,32 @@ int main(int argc, char *argv[])
     /* Flag for whether or not we want verbose output */
     int verbose = 0;
 
-    if (4 == argc) {
-	if (strncmp("-v", argv[3], 5)) {
-	    fprintf(stderr, "Invalid optional argument!\n");
-	    usage(argv[0]);
+    /* Flag for whether or not we want a Facsimile file */
+    int facsimile = 0; 
 
+    /* Argument parsing... */
+    const char *option_string = "vf";
+    int option = getopt(argc - 2, &argv[2], option_string);
+    opterr = 0;
+
+    while (-1 != option) {
+	switch (option) {
+	case 'v':
+	    verbose = 1;
+	    break;
+	case 'f':
+	    facsimile = 1;
+	    break;
+	case '?':
+	    fprintf(stderr, "Invalid argument \'%c\'!\n", optopt);
+	    usage(argv[0]);
+	    return 1;
+	default:
+	    usage(argv[0]);
 	    return 1;
 	}
-	else {
-	    verbose = 1;
-	}
+
+	option = getopt(argc - 2, &argv[2], option_string);
     }
 
     FILE *input_file = fopen(argv[1], "r");
@@ -91,12 +109,17 @@ int main(int argc, char *argv[])
     fclose(input_file);
     printf("Loaded %zd pipes...\n", total_pipes);
 
-    if (verbose) {
-	printf("Creating verbose output -- make sure serial pins are free!\n");
-	write_arduino_code_verbose(output_file, pipes, total_pipes);
+    if (!facsimile) {
+	if (verbose) {
+	    printf("Creating verbose output -- make sure serial pins are free!\n");
+	    write_arduino_code_verbose(output_file, pipes, total_pipes);
+	}
+	else {
+	    write_arduino_code(output_file, pipes, total_pipes);
+	}
     }
     else {
-	write_arduino_code(output_file, pipes, total_pipes);
+	write_facsimile_code(output_file, pipes, total_pipes);
     }
 
     printf("Done. Wrote to \"%s\"\n", argv[2]);
