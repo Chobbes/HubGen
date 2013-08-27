@@ -112,13 +112,13 @@ static void write_output_decs(FILE *out_file,
 	}
 
 	/* Write the output declaration */
-	write_indents(out_file, 2);
+	write_indents(out_file, 1);
 	fprintf(out_file, "output ");
 	out_name(out_file, pipe.out_pin);
 	fprintf(out_file, " port %d = false;\n", pipe.out_pin);
 
 	/* Write the channel declaration for the output */
-	write_indents(out_file, 2);
+	write_indents(out_file, 1);
 	fprintf(out_file, "int ");
 	out_channel(out_file, pipe.out_pin);
 	fprintf(out_file, " = %d;\n\n", pipe.channel);
@@ -209,11 +209,56 @@ static void write_out_updates(FILE *out_file,
 }
 
 
+static void write_phase(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
+{
+    int outputs[total_pipes];
+    size_t output_count = 0;
+
+    write_indents(out_file, 2);
+    fprintf(out_file, "phase update {\n");
+
+    for (size_t index = 0; index < total_pipes; ++index) {
+	MuxPipe pipe = pipes[index];
+
+	if (int_in_array(pipe.out_pin, outputs, output_count)) {
+	    continue;
+	}
+
+	/* Write the update statements for the output */
+	write_out_updates(out_file, pipes, total_pipes, pipe.out_pin);
+	fprintf(out_file, "\n");
+
+	/* Add output to the array of outputs that we have seen */
+	outputs[output_count] = pipe.out_pin;
+	++output_count;
+    }
+
+    write_indents(out_file, 2);
+    fprintf(out_file, "}\n");
+}
+
+
+static void write_process(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
+{
+    write_indents(out_file, 1);
+    fprintf(out_file, "process mux_update {\n");
+
+    write_phase(out_file, pipes, total_pipes);
+
+    write_indents(out_file, 1);
+    fprintf(out_file, "}");
+}
+
+
 void write_facsimile_code(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
 {
     fprintf(out_file, "unit hub {\n");
     write_output_decs(out_file, pipes, total_pipes);
     fprintf(out_file, "\n");
+
     write_input_decs(out_file, pipes, total_pipes);
+    fprintf(out_file, "\n");
+
+    write_process(out_file, pipes, total_pipes);
     fprintf(out_file, "\n}\n");
 }
