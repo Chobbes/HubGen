@@ -49,11 +49,11 @@
 
   #+BEGIN_SRC c
     unit hub {
-        output out# = false;
+        output out# port # = false;
         int out#_chan = n;  // n is the first pipe with this output's channel.
         // More of these...
     
-        input in#;
+        input in# port #;
         // More of these as well...
     
         process mux_update {
