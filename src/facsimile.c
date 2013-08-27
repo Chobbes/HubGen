@@ -95,7 +95,9 @@ static int int_in_array(int number, int *array, size_t array_length)
     return 0;
 }
 
-static void write_output_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
+static void write_output_decs(FILE *out_file,
+			      MuxPipe *pipes,
+			      size_t total_pipes)
 {
     int outputs[total_pipes];
     size_t output_count = 0;
@@ -143,7 +145,7 @@ static void write_input_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
 	}
 
 	/* Write the output declaration */
-	write_indents(out_file, 2);
+	write_indents(out_file, 1);
 	fprintf(out_file, "input ");
 	in_name(out_file, pipe.in_pin);
 	fprintf(out_file, " port %d;\n", pipe.in_pin);
@@ -151,6 +153,58 @@ static void write_input_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
 	/* Record in the inputs array */
 	inputs[input_count] = pipe.in_pin;
 	++input_count;
+    }
+}
+
+
+static void write_out_updates(FILE *out_file,
+			      MuxPipe *pipes,
+			      size_t total_pipes,
+			      int out_pin)
+{
+    int channels[total_pipes];
+    size_t channel_count = 0;
+
+    for (size_t index = 0; index < total_pipes; ++index) {
+	MuxPipe pipe = pipes[index];
+
+	/* Check if we need to add something for this pipe. */
+	if (pipe.out_pin != out_pin) {
+	    continue;
+	}
+	else if (int_in_array(pipe.channel, channels, channel_count)) {
+	    continue;
+	}
+
+	write_indents(out_file, 3);
+
+	if (0 == channel_count) {
+	    fprintf(out_file, "if (");
+	}
+	else {
+	    fprintf(out_file, "else if (");
+	}
+
+	out_channel(out_file, out_pin);
+	fprintf(out_file, " == %d) {\n", pipe.channel);
+
+	/* Body of the if statement */
+	write_indents(out_file, 4);
+	out_name(out_file, out_pin);
+	fprintf(out_file, " = ");
+	write_channel_inputs(out_file,
+			     pipes,
+			     total_pipes,
+			     out_pin,
+			     pipe.channel);
+	fprintf(out_file, ";\n");
+
+	write_indents(out_file, 3);
+	fprintf(out_file, "}\n");
+
+	/* Now add to the array of channels that we have seen */
+	channels[channel_count] = pipe.channel;
+	++channel_count;
     }
 }
 
