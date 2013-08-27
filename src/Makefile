@@ -28,13 +28,10 @@ MUXDUINO_DIR = ~/arduino-ua/libraries-osx/muxduino/
 CFLAGS += -I $(MUXDUINO_DIR) -I $(MUXPARSE_DIR)
 LDFLAGS += -L $(MUXPARSE_DIR) -lmuxparse
 
-hubgen : hubgen.o pipes.o codegen.o
+hubgen : hubgen.o pipes.o codegen.o facsimile.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 hubgen.o : hubgen.c pipes.h codegen.h
-	$(CC) -c $< $(CFLAGS)
-
-pipes.o : pipes.c pipes.h
 	$(CC) -c $< $(CFLAGS)
 
 %.o : %.c %.h
@@ -45,5 +42,7 @@ clean:
 	$(RM) hubgen.o
 	$(RM) pipes.o
 	$(RM) codegen.o
+	$(RM) facsimile.o
+
 
 .PHONY: clean
