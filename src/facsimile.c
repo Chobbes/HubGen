@@ -100,9 +100,6 @@ static void write_output_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes
     int outputs[total_pipes];
     size_t output_count = 0;
 
-    int inputs[total_pipes];
-    size_t input_count = 0;
-
     /* Output declarations */
     for (size_t index = 0; index < total_pipes; ++index) {
 	MuxPipe pipe = pipes[index];
@@ -128,14 +125,19 @@ static void write_output_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes
 	outputs[output_count] = pipe.out_pin;
 	++output_count;
     }
+}
 
-    fprintf(out_file, "\n");
+
+static void write_input_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
+{
+    int inputs[total_pipes];
+    size_t input_count = 0;
 
     /* Input declarations */
     for (size_t index = 0; index < total_pipes; ++index) {
 	MuxPipe pipe = pipes[index];
 
-	/* Check if we have already recorded the output */
+	/* Check if we have already recorded the input */
 	if (int_in_array(pipe.in_pin, inputs, input_count)) {
 	    continue;
 	}
@@ -157,5 +159,7 @@ void write_facsimile_code(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
 {
     fprintf(out_file, "unit hub {\n");
     write_output_decs(out_file, pipes, total_pipes);
+    fprintf(out_file, "\n");
+    write_input_decs(out_file, pipes, total_pipes);
     fprintf(out_file, "\n}\n");
 }
