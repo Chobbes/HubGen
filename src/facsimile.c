@@ -23,6 +23,8 @@
 */
 
 #include "facsimile.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <mux_pipe.h>
 
@@ -33,7 +35,7 @@ static const char *indent = "    ";
 static void write_indents(FILE *out_file, int level)
 {
     for (int amount = 0; amount < level; ++amount) {
-	fprintf(out_file "%s", indent);
+	fprintf(out_file, "%s", indent);
     }
 }
 
@@ -154,5 +156,6 @@ static void write_output_decs(FILE *out_file, MuxPipe *pipes, size_t total_pipes
 void write_facsimile_code(FILE *out_file, MuxPipe *pipes, size_t total_pipes)
 {
     fprintf(out_file, "unit hub {\n");
+    write_output_decs(out_file, pipes, total_pipes);
     fprintf(out_file, "\n}\n");
 }
