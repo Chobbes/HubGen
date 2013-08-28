@@ -16,7 +16,7 @@
   you need to know is:
 
   #+BEGIN_EXAMPLE
-    $ hubgen <input filename> <output filename> [-v]
+    $ hubgen <input filename> <output filename> [-v] [-f]
   #+END_EXAMPLE
 
   Where *<input filename>* and *<output filename>* are replaced by the
@@ -39,6 +39,12 @@
   occured when registering MuxDuino pipes, and the values written to
   ouput pins in the network. Note that if this option is used the
   serial pins, 0 and 1, must be free and not used in the network!
+
+  Another optional argument *-f* may also be supplied. In this case
+  the code generated is not Arduino C++ code, but Facsimile code
+  instead. The *-v* option does nothing in this case because Facsimile
+  does not support serial output anyway. The advantage of this is that
+  you can more easily use your hub in model checking.
 
 * Facsimile Code Generation
   We may want to add a Facsimile code generator so that we can check
